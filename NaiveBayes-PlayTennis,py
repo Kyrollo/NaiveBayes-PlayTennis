@@ -1,0 +1,37 @@
+import pandas as pd
+
+# Read the data
+data=pd.read_csv("PlayTennis.csv")
+# Columns names
+columns = data.columns
+
+# Calculate the number of Yes and No in the Play Tennis column(play or not)
+def PlayTennis(data):
+    yesCount = data[data['Play Tennis'] == 'Yes'].shape[0]
+    noCount = data[data['Play Tennis'] == 'No'].shape[0]
+    return yesCount, noCount
+# Calculate the likelihood probability of the attribute for specific column
+def likelihood_Probability(data, columnName, attribute):
+    attribute_yes = data[(data[columnName] == attribute) & (data['Play Tennis'] == 'Yes')].shape[0]
+    attribute_no = data[(data[columnName] == attribute) & (data['Play Tennis'] == 'No')].shape[0]
+    return attribute_yes, attribute_no
+
+# Predict the Play or no for test case
+def predict(data, attributes):
+    yesCount, noCount = PlayTennis(data)
+    yes=1
+    no=1
+    for i,column in enumerate(columns[:-1]):
+        yes_column, no_column = likelihood_Probability(data, column, attributes[i])
+        yes *= (yes_column/yesCount)
+        no *= (no_column/noCount)
+    yes*=(yesCount/(yesCount+noCount))
+    no *= (noCount / (yesCount + noCount))
+    print("yes probability = ", yes)
+    print("no probability = ", no)
+    if (yes > no):
+        return 'Yes'
+    else:
+        return 'No'
+    
+print("PLay tennis? \nThe answer is: ",predict(data, ['Sunny', 'Cool', 'High', 'Strong']))
